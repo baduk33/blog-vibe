@@ -8,7 +8,7 @@ export const test = (req, res) => {
 
 export const updateUser = async (req, res, next) => {
     if (req.user.id !== req.params.userId) {
-        return next(errorHandler(401, "Your are not to update this  user"))
+        return next(errorHandler(401, "Your are not allowed to update this  user"))
     }
 
     if (req.body.password) {
@@ -25,7 +25,7 @@ export const updateUser = async (req, res, next) => {
         if (req.body.username.includes(" ")) {
             return next(errorHandler(400, "Username cannot contain spaces"));
         }
-        if (req.body.username !== req.body.username.toLowercase()) {
+        if (req.body.username !== req.body.username.toLowerCase()) {
             return next(errorHandler(400, "Username must be in lowercase"));
         }
         if (!req.body.username.match(/^[a-zA-Z0-9]+$/)) {
@@ -41,7 +41,7 @@ export const updateUser = async (req, res, next) => {
                     password: req.body.password
                 }
             }, { new: true })
-            const{password, ...rest} = updatedUser._doc;
+            const { password, ...rest } = updatedUser._doc;
             res.status(200).json(rest)
         } catch (error) {
             next(error)
