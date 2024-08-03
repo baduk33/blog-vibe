@@ -8,6 +8,7 @@ export const test = (req, res) => {
 
 export const updateUser = async (req, res, next) => {
 
+
     if (req.body.password) {
         if (req.body.password < 6) {
             return next(errorHandler(400, "Password must be at least 6 characters"));
@@ -44,4 +45,17 @@ export const updateUser = async (req, res, next) => {
     } catch (error) {
         next(error)
     }
+}
+
+export const deleteUser = async (req, res, next) =>{
+        if(req.user.id !== req.params.userId){
+            return next(errorHandler(403, "You are not allowed to delete this account"));
+        }
+
+        try {
+            await User.findByIdAndDelete(req.params.userId);
+            res.status(200).json('Account has been deleted');
+        } catch (error) {
+            next(error)
+        }
 }
