@@ -1,10 +1,11 @@
 import React from 'react'
 import { Navbar, TextInput, Button, Dropdown, Avatar, DropdownItem } from "flowbite-react"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { IoSearch } from "react-icons/io5"
 import { FaMoon, FaSun } from "react-icons/fa"
 import { useSelector, useDispatch } from "react-redux"
 import { toggleTheme } from '../redux/theme/themeSlice'
+import { signoutSuccess } from '../redux/user/userSlice'
 
 function Header() {
 
@@ -12,6 +13,24 @@ function Header() {
     const { currentUser } = useSelector(state => state.user);
     const {theme} = useSelector(state => state.theme)
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const handleSignout = async () => {
+        try {
+          const res = await fetch('/api/user/signout', {
+            method: 'POST'
+          })
+          const data = await res.json();
+          if (!res.ok) {
+            console.log(data.message);
+          } else {
+            dispatch(signoutSuccess(data));
+          }
+          navigate("/sign-in")
+        } catch (error) {
+          console.log(error.message);
+        }
+      }
 
     return (
         <Navbar className='border-2'>
@@ -53,7 +72,7 @@ function Header() {
                             <Dropdown.Item>Profile</Dropdown.Item>
                         </Link>
                         <Dropdown.Divider />
-                        <DropdownItem>Sign out</DropdownItem>
+                        <DropdownItem onClick={handleSignout}>Sign out</DropdownItem>
                     </Dropdown>
                 ) : (
                     <Link to='/sign-in'>
