@@ -29,7 +29,7 @@ export const create = async (req, res, next) => {
 
 export const getPosts = async (req, res, next) => {
     try {
-        const start = parseInt(req.query.start) || 0;
+        const startIndex = parseInt(req.query.startIndex) || 0;
         const limit = parseInt(req.query.limit) || 9;
         const sortDirection = req.query.order === "asc" ? 1 : -1;
 
@@ -48,7 +48,7 @@ export const getPosts = async (req, res, next) => {
 
         const posts = await Post.find({ $and: queryConditions.length ? queryConditions : [{}] })
             .sort({ updatedAt: sortDirection })
-            .skip(start)
+            .skip(startIndex)
             .limit(limit);
 
         const totalPosts = await Post.countDocuments();
