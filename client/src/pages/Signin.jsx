@@ -40,6 +40,9 @@ function Signin() {
       }
 
       if(res.ok){
+        localStorage.setItem('token', data.token);
+        // localStorage.setItem('id', data.id);
+
         dispatch(signInSuccess(data))
         navigate("/");
       }

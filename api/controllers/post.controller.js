@@ -3,7 +3,8 @@ import { errorHandler } from "../utils/error.js"
 
 export const create = async (req, res, next) => {
     
-    if (!req.user.isAdmin) {
+    const admin = req.user.isAdmin;
+    if (!admin) {
         return next(errorHandler(403, "You are not allowed to create a post"))
     }
 
