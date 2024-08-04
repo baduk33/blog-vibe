@@ -118,7 +118,7 @@ function DashPosts() {
                   </Table.Cell>
 
                   <Table.Cell>
-                    <Link to={`/post/${post._id}`} className='text-teal-500 dark:text-teal-300 hover:underline'>
+                    <Link to={`/update-post/${post._id}`} className='text-teal-500 dark:text-teal-300 hover:underline'>
                       <span>
                         Edit
                       </span>
