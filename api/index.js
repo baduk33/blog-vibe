@@ -14,6 +14,12 @@ mongoose.connect(process.env.MONGO)
 
 const app = express();
 
+app.use((req, res, next) => {
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    next();
+});
+
+
 app.use(cookieParser());
 app.use(express.json());
 
