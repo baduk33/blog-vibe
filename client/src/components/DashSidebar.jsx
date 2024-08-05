@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Sidebar } from "flowbite-react";
-import { FaUser } from "react-icons/fa";
+import { FaUser, FaUsers } from "react-icons/fa";
 import { HiArrowRightOnRectangle, HiDocumentText } from "react-icons/hi2";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
@@ -69,6 +69,18 @@ function DashSidebar() {
                 as="div"
               >
                 Posts
+              </Sidebar.Item>
+            </Link>
+          )}
+
+          {currentUser.isAdmin && (
+            <Link to='/dashboard?tab=users'>
+              <Sidebar.Item
+                active={tab === "users"}
+                icon={FaUsers}
+                as="div"
+              >
+                Users
               </Sidebar.Item>
             </Link>
           )}
