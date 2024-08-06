@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Navbar, TextInput, Button, Dropdown, Avatar, DropdownItem } from "flowbite-react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { IoSearch } from "react-icons/io5"
@@ -11,26 +11,46 @@ function Header() {
 
     const path = useLocation().pathname;
     const { currentUser } = useSelector(state => state.user);
-    const {theme} = useSelector(state => state.theme)
+    const { theme } = useSelector(state => state.theme)
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const location = useLocation();
+
+    const [searchTerm, setSearchTerm] = useState("");
+
+    useEffect(() => {
+        const urlParams = new URLSearchParams(location.search);
+        const searchTermFromUrl = urlParams.get("searchTerm");
+        if (searchTermFromUrl) {
+            setSearchTerm(searchTermFromUrl);
+        }
+    }, [location.search])
+
     const handleSignout = async () => {
         try {
-          const res = await fetch('/api/user/signout', {
-            method: 'POST'
-          })
-          const data = await res.json();
-          if (!res.ok) {
-            console.log(data.message);
-          } else {
-            dispatch(signoutSuccess(data));
-          }
-          navigate("/sign-in")
+            const res = await fetch('/api/user/signout', {
+                method: 'POST'
+            })
+            const data = await res.json();
+            if (!res.ok) {
+                console.log(data.message);
+            } else {
+                dispatch(signoutSuccess(data));
+            }
+            navigate("/sign-in")
         } catch (error) {
-          console.log(error.message);
+            console.log(error.message);
         }
-      }
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const urlParams = new URLSearchParams(location.search);
+        urlParams.set("searchTerm", searchTerm);
+        const searchQuery = urlParams.toString();
+        navigate(`/search?${searchQuery}`);
+    }
 
     return (
         <Navbar className='border-2'>
@@ -39,19 +59,23 @@ function Header() {
                 Vibe
             </Link>
 
-            <TextInput
-                type='text'
-                placeholder='Search...'
-                rightIcon={IoSearch}
-                className='hidden lg:inline'
-            />
+            <form onSubmit={handleSubmit}>
+                <TextInput
+                    type='text'
+                    placeholder='Search...'
+                    rightIcon={IoSearch}
+                    className='hidden lg:inline'
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </form>
             <Button className='w-12 h-10 lg:hidden' color='gray' pill>
                 <IoSearch />
             </Button>
 
             <div className='flex gap-3 md:order-2'>
                 <Button className='w-12 h-10 hidden sm:inline' color='gray' pill onClick={() => dispatch(toggleTheme())}>
-                    {theme==="light" ? <FaMoon /> : <FaSun />}
+                    {theme === "light" ? <FaMoon /> : <FaSun />}
                 </Button>
                 {currentUser ? (
                     <Dropdown
