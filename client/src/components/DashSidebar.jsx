@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { signoutSuccess } from '../redux/user/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { MdMessage } from "react-icons/md";
 
 function DashSidebar() {
 
@@ -81,6 +82,18 @@ function DashSidebar() {
                 as="div"
               >
                 Users
+              </Sidebar.Item>
+            </Link>
+          )}
+
+          {currentUser.isAdmin && (
+            <Link to='/dashboard?tab=comments'>
+              <Sidebar.Item
+                active={tab === "comments"}
+                icon={MdMessage}
+                as="div"
+              >
+                Comments
               </Sidebar.Item>
             </Link>
           )}
