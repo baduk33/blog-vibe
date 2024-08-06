@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import CommentSection from './CommentSection';
 import { Button, Textarea } from 'flowbite-react';
 
-function Comment({ comment, onLike, onEdit }) {
+function Comment({ comment, onLike, onEdit, onDelete }) {
 
     const { currentUser } = useSelector(state => state.user);
 
@@ -45,13 +45,13 @@ function Comment({ comment, onLike, onEdit }) {
                 })
             });
             const data = await res.json();
-            if(res.ok){
+            if (res.ok) {
                 setIsEditing(false);
                 onEdit(comment, editedContent);
             }
         } catch (error) {
             console.log(error);
-            
+
         }
     }
 
@@ -77,19 +77,19 @@ function Comment({ comment, onLike, onEdit }) {
                         />
                         <div className="flex justify-end gap-2 text-xs">
                             <Button
-                            type='button'
-                            size='sm'
-                            gradientDuoTone='purpleToBlue'
-                            onClick={handleSave}
+                                type='button'
+                                size='sm'
+                                gradientDuoTone='purpleToBlue'
+                                onClick={handleSave}
                             >
                                 Save
                             </Button>
                             <Button
-                            type='button'
-                            size='sm'
-                            gradientDuoTone='purpleToBlue'
-                            outline
-                            onClick={()=> setIsEditing(false)}
+                                type='button'
+                                size='sm'
+                                gradientDuoTone='purpleToBlue'
+                                outline
+                                onClick={() => setIsEditing(false)}
                             >
                                 Cancel
                             </Button>
@@ -118,13 +118,23 @@ function Comment({ comment, onLike, onEdit }) {
                             </p>
                             {
                                 currentUser && (currentUser._id === comment.userId || currentUser.isAdmin) && (
-                                    <button
-                                        type='button'
-                                        className='text-gray-400 hover:text-blue-500'
-                                        onClick={handleEdit}
-                                    >
-                                        Edit
-                                    </button>
+                                    <>
+                                        <button
+                                            type='button'
+                                            className='text-gray-400 hover:text-blue-500'
+                                            onClick={handleEdit}
+                                        >
+                                            Edit
+                                        </button>
+
+                                        <button
+                                            type='button'
+                                            className='text-gray-400 hover:text-red-500'
+                                            onClick={() => onDelete(comment._id)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </>
                                 )
                             }
                         </div>
