@@ -192,7 +192,7 @@ function DashProfile() {
           placeholder='Username'
           id='username'
           defaultValue={currentUser.username}
-          onChange={handleChange}
+          readOnly
         />
         <TextInput
           type='email'
