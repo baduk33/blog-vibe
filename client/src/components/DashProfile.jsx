@@ -20,6 +20,12 @@ function DashProfile() {
   const [updateUserError, setUpdateUserError] = useState(null)
   const [formData, setFormData] = useState({})
   const [showModel, setShowModel] = useState(false)
+  const [modalType, setModalType] = useState(null)
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [password, setPassword] = useState({})
+  const [updatePasswordError, setUpdatePasswordError] = useState(null)
 
   const filePickerRef = useRef();
 
@@ -118,6 +124,37 @@ function DashProfile() {
     }
   }
 
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+
+    if (newPassword !== confirmPassword) {
+      setUpdatePasswordError("New password and confirmation password do not match");
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/user/updatePassword/${currentUser._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ oldPassword, newPassword, confirmPassword })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setUpdatePasswordError(data.message);
+      } else {
+        setUpdatePasswordError(null);
+        setUpdateUserSuccess("Password updated successfully");
+        setShowModel(false);
+      }
+    } catch (error) {
+      setUpdatePasswordError("Failed to update password");
+    }
+  };
+
+
   const handleDeleteUser = async () => {
     setShowModel(false);
     try {
@@ -206,6 +243,11 @@ function DashProfile() {
           placeholder='Password'
           id='password'
           onChange={handleChange}
+          onClick={() => {
+            setShowModel(true)
+            setModalType("password")
+          }}
+          readOnly
         />
 
         <Button type='submit' gradientDuoTone="purpleToBlue" outline disabled={loading || imageFileUploading}>
@@ -226,7 +268,12 @@ function DashProfile() {
         }
       </form>
       <div className='text-red-600 flex justify-between mt-5'>
-        <span className='cursor-pointer' onClick={() => setShowModel(true)}>Delete Account</span>
+        <span
+          className='cursor-pointer'
+          onClick={() => {
+            setShowModel(true)
+            setModalType("delete")
+          }}>Delete Account</span>
         <span className='cursor-pointer' onClick={handleSignout}>Sign Out</span>
       </div>
       {updateUserSuccess && (
@@ -249,18 +296,62 @@ function DashProfile() {
 
       <Modal show={showModel} onClose={() => setShowModel(false)} popup size='md'>
         <Modal.Header />
-        <Modal.Body>
-          <div className="text-center">
-            <IoAlertCircleOutline className='w-14 h-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto' />
-            <h3 className='text-lg mb-4 text-gray-500 dark:text-gray-400'>Are you sure you want to delete your Account?</h3>
-            <div className='flex justify-center gap-5'>
-              <Button color='failure' onClick={handleDeleteUser}>Yes, I'm sure</Button>
-              <Button color='gray' onClick={() => setShowModel(false)}>No, cancel</Button>
+        {modalType === "delete" ? (
+          <Modal.Body>
+            <div className="text-center">
+              <IoAlertCircleOutline className='w-14 h-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto' />
+              <h3 className='text-lg mb-4 text-gray-500 dark:text-gray-400'>Are you sure you want to delete your Account?</h3>
+              <div className='flex justify-center gap-5'>
+                <Button color='failure' onClick={handleDeleteUser}>Yes, I'm sure</Button>
+                <Button color='gray' onClick={() => setShowModel(false)}>No, cancel</Button>
+              </div>
             </div>
-          </div>
-        </Modal.Body>
+          </Modal.Body>
+        ) : (
+          <Modal.Body>
+            <div className="text-center">
+              <IoAlertCircleOutline className='w-10 h-10 text-gray-400 dark:text-gray-200 mb-4 mx-auto' />
+              <h3 className='text-lg mb-4 text-gray-500 dark:text-gray-400'>Are you sure you want to change your Password?</h3>
+              <form onSubmit={handleChangePassword} className='flex flex-col gap-4'>
+                <TextInput
+                  type='password'
+                  placeholder='Old Password'
+                  id='oldPassword'
+                  value={oldPassword}
+                  onChange={(e) => {
+                    setOldPassword(e.target.value);
+                  }}
+                />
+                <TextInput
+                  type='password'
+                  placeholder='New Password'
+                  id='newPassword'
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+                <TextInput
+                  type='password'
+                  placeholder='Confirm New Password'
+                  id='confirmPassword'
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+                <div className="flex justify-center gap-5">
+                  <Button color='failure' type='submit'>Yes, Change Password</Button>
+                  <Button color='gray' onClick={() => setShowModel(false)}>No, cancel</Button>
+                </div>
+              </form>
+            </div>
+            {updatePasswordError && (
+              <Alert color="failure" className='mt-5'>
+                {updatePasswordError}
+              </Alert>
+            )}
+          </Modal.Body>
+        )}
+
       </Modal>
-    </div>
+    </div >
   )
 }
 

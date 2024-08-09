@@ -31,6 +31,40 @@ export const updateUser = async (req, res, next) => {
     }
 }
 
+export const updatePassword = async (req, res, next) => {
+    const { oldPassword, newPassword, confirmPassword } = req.body;
+
+    try {
+
+        const user = await User.findById(req.params.userId);
+        if (!user) {
+            return next(errorHandler(404, "User not found"));
+        }
+
+        const isMatch = await bcryptjs.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return next(errorHandler(400, "Old password is incorrect"));
+        }
+
+        if (newPassword !== confirmPassword) {
+            return next(errorHandler(400, "New password and confirmation password do not match"));
+        }
+
+        if (newPassword === oldPassword) {
+            return next(errorHandler(400, "New password cannot be the same as the old password"));
+        }
+
+        const hashedPassword = bcryptjs.hashSync(newPassword, 10);
+
+        user.password = hashedPassword;
+        await user.save();
+
+        res.status(200).json({ message: "Password updated successfully" });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const deleteUser = async (req, res, next) => {
 
     try {
@@ -61,24 +95,24 @@ export const getUsers = async (req, res, next) => {
             .skip(startIndex)
             .limit(limit);
 
-            const usersWithoutPassword = users.map((user) => {
-                const { password,...rest } = user._doc;
-                return rest;
-            })
+        const usersWithoutPassword = users.map((user) => {
+            const { password, ...rest } = user._doc;
+            return rest;
+        })
 
-            const totalUsers = await User.countDocuments();
+        const totalUsers = await User.countDocuments();
 
-            const now = new Date();
-            const oneMonthAgo = new Date(
-                now.getFullYear(),
-                now.getMonth() - 1,
-                now.getDate()
-            );
-            const lastMonthUsers = await User.countDocuments({
-                createdAt: { $gte: oneMonthAgo }
-            });
+        const now = new Date();
+        const oneMonthAgo = new Date(
+            now.getFullYear(),
+            now.getMonth() - 1,
+            now.getDate()
+        );
+        const lastMonthUsers = await User.countDocuments({
+            createdAt: { $gte: oneMonthAgo }
+        });
 
-            res.status(200).json({ users: usersWithoutPassword, totalUsers, lastMonthUsers });
+        res.status(200).json({ users: usersWithoutPassword, totalUsers, lastMonthUsers });
     } catch (error) {
         next(error)
     }
@@ -90,8 +124,8 @@ export const getUser = async (req, res, next) => {
         if (!user) {
             return next(errorHandler(404, "User not found"));
         }
-        
-        const {password, ...rest} = user._doc;
+
+        const { password, ...rest } = user._doc;
         res.status(200).json(rest);
     } catch (error) {
         next(error);
