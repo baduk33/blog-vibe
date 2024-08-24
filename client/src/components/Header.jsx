@@ -70,7 +70,9 @@ function Header() {
                 />
             </form>
             <Button className='w-12 h-10 lg:hidden' color='gray' pill>
-                <IoSearch />
+                <Link to='/search'>
+                    <IoSearch />
+                </Link>
             </Button>
 
             <div className='flex gap-3 md:order-2'>
