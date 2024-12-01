@@ -24,7 +24,6 @@ function DashProfile() {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [password, setPassword] = useState({})
   const [updatePasswordError, setUpdatePasswordError] = useState(null)
 
   const filePickerRef = useRef();
@@ -47,16 +46,6 @@ function DashProfile() {
   }, [imageFile])
 
   const uploadImage = async () => {
-    // service firebase.storage {
-    //   match /b/{bucket}/o {
-    //     match /{allPaths=**} {
-    //       allow read;
-    //       allow write: if
-    //       request.resource.size < 2 * 1024 * 1024 &&
-    //       request.resource.contentType.matches('image/.*');
-    //     }
-    //   }
-    // }
 
     setImageFileUploading(true);
     setImageFileUploadError(null);
