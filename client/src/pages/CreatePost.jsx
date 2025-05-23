@@ -25,29 +25,21 @@ function CreatePost() {
                 return;
             }
             setImageUploadError(null);
-            const storage = getStorage(app);
-            const fileName = new Date().getTime() + "-" + file.name;
-            const storageRef = ref(storage, fileName);
-            const uploadTask = uploadBytesResumable(storageRef, file);
-            uploadTask.on(
-                'state_changed',
-                (snapshot) => {
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    setImageUploadProgress(progress.toFixed(0));
-                },
-                (error) => {
-                    setImageUploadError("Image upload error");
-                    setImageUploadProgress(null);
-                },
-                () => {
-                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                        setImageUploadProgress(null);
-                        setImageUploadError(null);
-                        setFormData({ ...formData, image: downloadURL });
-                    })
-                }
-            )
-        } catch (error) {
+            const data = new FormData();
+            data.append("file", file);
+            data.append("upload_preset", "unsigned_preset");
+          
+            const res = await fetch("https://api.cloudinary.com/v1_1/dpaxwm2xz/image/upload", {
+                method: "POST",
+                body: data,
+            });
+
+            const json = await res.json();
+            console.log("Image uploaded to Cloudinary:", json.secure_url);
+            setImageUploadError(null);
+            setFormData({ ...formData, image: json.secure_url });
+        } 
+        catch(error){
             setImageUploadError("Image upload failed");
             setImageUploadProgress(null);
         }
@@ -128,7 +120,9 @@ function CreatePost() {
                     <img
                         src={formData.image}
                         alt="post-image"
-                        className='w-full h-72 object-cover'
+                        // className='w-full h-72 object-cover'
+                        width="100px" 
+                        height="100px"
                     />
                 )}
                 <ReactQuill

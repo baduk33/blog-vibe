@@ -2,16 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { Alert, Button, FileInput, Select, TextInput } from 'flowbite-react'
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage"
-import { app } from "../firebase"
 import { CircularProgressbar } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
 import { useNavigate, useParams } from "react-router-dom"
 import { useSelector } from 'react-redux';
 
 function UpdatePost() {
-
-    const {currentUser} = useSelector(state => state.user);
+    const { currentUser } = useSelector(state => state.user);
 
     const [file, setFile] = useState(null);
     const [imageUploadProgress, setImageUploadProgress] = useState(null)
@@ -20,30 +17,24 @@ function UpdatePost() {
     const [publishError, setPublishError] = useState(null)
 
     const { postId } = useParams();
-
     const navigate = useNavigate();
 
     useEffect(() => {
-        try {
-            const fetchPost = async () => {
+        const fetchPost = async () => {
+            try {
                 const res = await fetch(`/api/post/getposts?postId=${postId}`);
                 const data = await res.json();
-                if(!res.ok){
-                    console.log(data.message);
+                if (!res.ok) {
                     setPublishError(data.message)
                     return;
                 }
-                if(res.ok){
-                    setPublishError(null);
-                    setFormData(data.posts[0]);
-                }
+                setFormData(data.posts[0]);
+            } catch (error) {
+                setPublishError("Failed to fetch post data");
             }
-            fetchPost()
-        } catch (error) {
-            console.log(error);
-
-        }
-    }, [postId])
+        };
+        fetchPost();
+    }, [postId]);
 
     const handleUploadImage = async () => {
         try {
@@ -52,33 +43,22 @@ function UpdatePost() {
                 return;
             }
             setImageUploadError(null);
-            const storage = getStorage(app);
-            const fileName = new Date().getTime() + "-" + file.name;
-            const storageRef = ref(storage, fileName);
-            const uploadTask = uploadBytesResumable(storageRef, file);
-            uploadTask.on(
-                'state_changed',
-                (snapshot) => {
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    setImageUploadProgress(progress.toFixed(0));
-                },
-                (error) => {
-                    setImageUploadError("Image upload error");
-                    setImageUploadProgress(null);
-                },
-                () => {
-                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                        setImageUploadProgress(null);
-                        setImageUploadError(null);
-                        setFormData({ ...formData, image: downloadURL });
-                    })
-                }
-            )
+            const data = new FormData();
+            data.append("file", file);
+            data.append("upload_preset", "unsigned_preset");
+
+            const res = await fetch("https://api.cloudinary.com/v1_1/dpaxwm2xz/image/upload", {
+                method: "POST",
+                body: data,
+            });
+
+            const json = await res.json();
+            setFormData((prev) => ({ ...prev, image: json.secure_url }));
         } catch (error) {
             setImageUploadError("Image upload failed");
             setImageUploadProgress(null);
         }
-    }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -95,15 +75,18 @@ function UpdatePost() {
                 setPublishError(data.message);
                 return;
             }
-            if (res.ok) {
-                setPublishError(null);
-                navigate(`/post/${data.slug}`)
-            }
+            navigate(`/post/${data.slug}`)
         } catch (error) {
             setPublishError("Something went wrong!");
         }
+    };
 
-    }
+    const updateField = (field, value) => {
+        setFormData((prev) => ({
+            ...prev,
+            [field]: value
+        }));
+    };
 
     return (
         <div className='p-3 max-w-3xl min-h-screen mx-auto'>
@@ -117,12 +100,12 @@ function UpdatePost() {
                         required
                         id='title'
                         className='flex-1'
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        value={formData.title}
+                        onChange={(e) => updateField('title', e.target.value)}
+                        value={formData.title || ''}
                     />
                     <Select
-                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        value={formData.category}
+                        onChange={(e) => updateField('category', e.target.value)}
+                        value={formData.category || 'uncategorized'}
                     >
                         <option value='uncategorized'>Select a category</option>
                         <option value='javascript'>JavaScript</option>
@@ -130,6 +113,7 @@ function UpdatePost() {
                         <option value='nextjs'>Next.js</option>
                     </Select>
                 </div>
+
                 <div className='flex gap-5 items-center justify-between border-4 border-teal-500 border-dotted p-3'>
                     <FileInput type='file' accept='image/*' onChange={(e) => setFile(e.target.files[0])} />
                     <Button type='button' gradientDuoTone='purpleToBlue' size='sm' outline
@@ -148,35 +132,39 @@ function UpdatePost() {
                         )}
                     </Button>
                 </div>
+
                 {imageUploadError && (
-                    <Alert color='failure'>
-                        {imageUploadError}
-                    </Alert>
+                    <Alert color='failure'>{imageUploadError}</Alert>
                 )}
+
                 {formData.image && (
-                    <img
-                        src={formData.image}
-                        alt="post-image"
-                        className='w-full h-72 object-cover'
-                    />
+                    <div className="flex justify-center">
+                        <img
+                            src={formData.image}
+                            alt="post-image"
+                            width="150px" 
+                            height="150px"
+                        />
+                    </div>
                 )}
+
                 <ReactQuill
                     theme='snow'
-                    value={formData.content}
+                    value={formData.content || ''}
                     placeholder='Write something...'
                     className='h-72 mb-12'
                     required
-                    onChange={(value) => setFormData({ ...formData, content: value })}
+                    onChange={(value) => updateField('content', value)}
                 />
-                <Button type='submit' gradientDuoTone='purpleToPink' >Update Post</Button>
+
+                <Button type='submit' gradientDuoTone='purpleToPink'>Update Post</Button>
+
                 {publishError && (
-                    <Alert color='failure'>
-                        {publishError}
-                    </Alert>
+                    <Alert color='failure'>{publishError}</Alert>
                 )}
             </form>
         </div>
-    )
+    );
 }
 
-export default UpdatePost
+export default UpdatePost;

@@ -33,9 +33,11 @@ function DashProfile() {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
+    if (file && file.size < 2 * 1024 * 1024) {
       setImageFile(file);
       setImageFileUrl(URL.createObjectURL(file));
+    } else {
+      setImageFileUploadError("File must be less than 2MB");
     }
   }
 
@@ -50,7 +52,8 @@ function DashProfile() {
     setImageFileUploading(true);
     setImageFileUploadError(null);
     const storage = getStorage(app);
-    const fileName = new Date().getTime() + imageFile.name;
+    // const fileName = new Date().getTime() + imageFile.name;
+    const fileName = `user-images/${new Date().getTime()}-${imageFile.name.replace(/\s+/g, '-')}`;
     const storageRef = ref(storage, fileName);
     const uploadTask = uploadBytesResumable(storageRef, imageFile);
     uploadTask.on('state_changed', (snapshot) => {

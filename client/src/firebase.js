@@ -1,17 +1,16 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: "blogvibe.firebaseapp.com",
-  projectId: "blogvibe",
-  storageBucket: "blogvibe.appspot.com",
-  messagingSenderId: "24579958521",
-  appId: "1:24579958521:web:77a628218afe4b7972a428"
+  apiKey: "AIzaSyDIXKi1BlqsmusJMkKcjgGF3xxDwiOql3E",
+  authDomain: "blogapp-acbc3.firebaseapp.com",
+  projectId: "blogapp-acbc3",
+  storageBucket: "blogapp-acbc3.firebasestorage.app",
+  messagingSenderId: "200923742040",
+  appId: "1:200923742040:web:1e5ec2cef6e9595704af2d"
 };
+
 
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);

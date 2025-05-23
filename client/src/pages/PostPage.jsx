@@ -72,18 +72,20 @@ function PostPage() {
                 <Button color='gray' pill size='xs'>{post && post.category}</Button>
             </Link>
 
-            <img src={post && post.image} alt={post && post.title} className='mt-10 p-3 max-h-[600px] w-full object-cover' />
+            <div className="flex justify-center">
+                <img
+                    src={post && post.image}
+                    alt={post && post.title}
+                    className="mt-10 p-3 max-h-[400px] w-[400px] object-cover"
+                />
+            </div>
             <div className="flex justify-between p-3 border-b border-slate-500 mx-auto w-full max-w-2xl text-sm">
                 <span>{post && new Date(post.createdAt).toLocaleDateString()}</span>
                 <span className='italic'>{post && (post.content.length / 1000).toFixed(0)} mins read</span>
             </div>
 
             <div dangerouslySetInnerHTML={{ __html: post && post.content }} className='p-3 max-w-2xl w-full mx-auto post-content'>
-            </div>
-
-            <div className="max-w-4xl mx-auto w-full">
-                <CallToAction />
-            </div>
+            </div>  
 
             <CommentSection postId={post._id} />
 
@@ -92,6 +94,10 @@ function PostPage() {
                 <div className="flex flex-wrap gap-5 mt-5 justify-center">
                     {recentPosts && recentPosts.posts.map((post) => <PostCard key={post._id} post={post} />)}
                 </div>
+            </div>
+
+            <div className="max-w-4xl mx-auto w-full">
+                <CallToAction />
             </div>
 
         </main>

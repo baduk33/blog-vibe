@@ -1,9 +1,6 @@
 import React from 'react'
 import { Footer } from 'flowbite-react'
 import { Link } from 'react-router-dom'
-import { FaFacebook } from "react-icons/fa";
-import { FaInstagram } from "react-icons/fa";
-import { FaTwitter } from "react-icons/fa";
 import { FaGithub } from "react-icons/fa";
 import { FaLinkedin } from "react-icons/fa";
 
@@ -45,16 +42,16 @@ function FooterCom() {
               <Footer.Title title='Follow Us' />
               <Footer.LinkGroup col>
                 <Footer.Link
-                  href='https://github.com/charanpreet01'
+                  href='https://github.com/baduk33'
                   target='_blank'
                   rel='noopener noreferrer'
                 >
                   Github
                 </Footer.Link>
                 <Footer.Link
-                  href='/'
+                  href='https://www.linkedin.com/in/kunj-sharma-a39794234'
                 >
-                  Discord
+                  LinkedIn
                 </Footer.Link>
               </Footer.LinkGroup>
             </div>
@@ -83,11 +80,8 @@ function FooterCom() {
           <Footer.Copyright href='/' by='Blog Vibe' year={new Date().getFullYear()} />
 
           <div className="flex gap-4 mt-2 sm:mt-5 sm:justify-center">
-            <Footer.Icon href='/' icon={FaFacebook} />
-            <Footer.Icon href='https://instagram.com/charanpreet01' icon={FaInstagram} />
-            <Footer.Icon href='/' icon={FaTwitter} />
-            <Footer.Icon href='https://github.com/charanpreet01' icon={FaGithub} />
-            <Footer.Icon href='/' icon={FaLinkedin} />
+            <Footer.Icon href='https://github.com/baduk33' icon={FaGithub} />
+            <Footer.Icon href='https://www.linkedin.com/in/kunj-sharma-a39794234' icon={FaLinkedin} />
           </div>
         </div>
       </div>
